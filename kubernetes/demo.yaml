@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  namespace: otel-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      labels:
+        app: load-generator
+    spec:
+      containers:
+        - name: load-generator
+          image: ghcr.io/open-telemetry/demo-load-generator:latest
+          ports:
+            - containerPort: 8080
+          resources:        # ✅ optional but recommended
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - mountPath: /data
+              name: load-generator-storage
+      volumes:
+        - name: load-generator-storage
+          persistentVolumeClaim:
+            claimName: load-generator-pvc
